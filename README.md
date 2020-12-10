@@ -14,24 +14,33 @@ npm i fastify-postgraphile
 ## Usage
 Require `fastify-postgraphile` and register it as any other plugin, it will add a `graphql` reply decorator.
 ```js
-const fastify = require('fastify')()
+const fastify = require('fastify')({ logger: true })
 
-fastify.register(require('fastify-postgraphile'), {
-  poolConfig: {
-    user: 'postgres',
+fastify.register(require('./lib/index.js'), {
+  pool: {
+    user: 'administrator',
     host: 'localhost',
-    database: 'postgres',
-    password: 'password',
+    database: 'administrator',
+    password: 'localhost',
     port: 5432
   },
-  schemas: 'public'
+  databaseUri: 'postgres://administrator:localhost@localhost:5432/administrator',
+  schemas: 'public',
+  middlewareEnabled: true,
+  middlewareOptions: {
+    graphiql: true,
+    watchPg: true
+  }
 })
 
-fastify.get('/', async (req, reply) => {
-  return reply.graphql(req.body.query, req.body.variables)
+// Run the server!
+fastify.listen(3000, function (err, address) {
+  if (err) {
+    fastify.log.error(err)
+    process.exit(1)
+  }
+  fastify.log.info(`server listening on ${address}`)
 })
-
-fastify.listen(3000)
 ```
 
 ## Acknowledgements
